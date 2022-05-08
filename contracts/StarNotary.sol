@@ -74,7 +74,19 @@ contract StarNotary is ERC721 {
         //1. Passing to star tokenId you will need to check if the owner of _tokenId1 or _tokenId2 is the sender
         //2. You don't have to check for the price of the token (star)
         //3. Get the owner of the two tokens (ownerOf(_tokenId1), ownerOf(_tokenId2)
-        //4. Use _transferFrom function to exchange the tokens.
+        //4. Use transferFrom function to exchange the tokens.
+        require(
+            ownerOf(_tokenId1) == msg.sender ||
+                ownerOf(_tokenId2) == msg.sender,
+            "Check if the owner of _tokenId1 or _tokenId2 is the sender failed"
+        );
+        address addr1 = ownerOf(_tokenId1);
+        address addr2 = ownerOf(_tokenId2);
+        address addrSwap = address(0x123);
+
+        transferFrom(addr1, addrSwap, _tokenId1);
+        transferFrom(addr2, addr1, _tokenId2);
+        transferFrom(addrSwap, addr2, _tokenId1);
     }
 
     // Implement Task 1 Transfer Stars
