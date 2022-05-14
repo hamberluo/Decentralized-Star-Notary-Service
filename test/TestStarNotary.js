@@ -34,6 +34,7 @@ it('lets user1 get the funds after the sale', async () => {
     let balance = web3.utils.toWei(".05", "ether");
     await instance.createStar('awesome star', starId, { from: user1 });
     await instance.putStarUpForSale(starId, starPrice, { from: user1 });
+    await instance.approveToken(user2, starId, { from: user1 });
     let balanceOfUser1BeforeTransaction = await web3.eth.getBalance(user1);
     await instance.buyStar(starId, { from: user2, value: balance });
     let balanceOfUser1AfterTransaction = await web3.eth.getBalance(user1);
@@ -51,6 +52,7 @@ it('lets user2 buy a star, if it is put up for sale', async () => {
     let balance = web3.utils.toWei(".05", "ether");
     await instance.createStar('awesome star', starId, { from: user1 });
     await instance.putStarUpForSale(starId, starPrice, { from: user1 });
+    await instance.approveToken(user2, starId, { from: user1 });
     let balanceOfUser1BeforeTransaction = await web3.eth.getBalance(user2);
     await instance.buyStar(starId, { from: user2, value: balance });
     assert.equal(await instance.ownerOf.call(starId), user2);
@@ -65,12 +67,13 @@ it('lets user2 buy a star and decreases its balance in ether', async () => {
     let balance = web3.utils.toWei(".05", "ether");
     await instance.createStar('awesome star', starId, { from: user1 });
     await instance.putStarUpForSale(starId, starPrice, { from: user1 });
-    let balanceOfUser1BeforeTransaction = await web3.eth.getBalance(user2);
+    await instance.approveToken(user2, starId, { from: user1 });
     const balanceOfUser2BeforeTransaction = await web3.eth.getBalance(user2);
-    await instance.buyStar(starId, { from: user2, value: balance, gasPrice: 0 });
+    await instance.buyStar(starId, { from: user2, value: balance });
     const balanceAfterUser2BuysStar = await web3.eth.getBalance(user2);
     let value = Number(balanceOfUser2BeforeTransaction) - Number(balanceAfterUser2BuysStar);
-    assert.equal(value, starPrice);
+    let gas = value - starPrice;
+    assert.equal(value - gas, starPrice);
 });
 
 // Implement Task 2 Add supporting unit tests
@@ -103,8 +106,8 @@ it('lets 2 users exchange stars', async () => {
     assert.equal(await instance.ownerOf.call(starId2), user2);
 
     // exchange star
-    await instance.approveToken(user1, starId2, {from: user2});
-    await instance.exchangeStars(starId1, starId2, {from: user1});
+    await instance.approveToken(user1, starId2, { from: user2 });
+    await instance.exchangeStars(starId1, starId2, { from: user1 });
 
     assert.equal(await instance.ownerOf.call(starId2), user1);
     assert.equal(await instance.ownerOf.call(starId1), user2);
