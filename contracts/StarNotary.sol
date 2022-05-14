@@ -82,11 +82,12 @@ contract StarNotary is ERC721 {
         );
         address addr1 = ownerOf(_tokenId1);
         address addr2 = ownerOf(_tokenId2);
-        address addrSwap = address(0x123);
-
-        transferFrom(addr1, addrSwap, _tokenId1);
+        transferFrom(addr1, addr2, _tokenId1);
         transferFrom(addr2, addr1, _tokenId2);
-        transferFrom(addrSwap, addr2, _tokenId1);
+    }
+
+    function approveToken(address to, uint256 tokenId) public {
+        approve(to, tokenId);
     }
 
     // Implement Task 1 Transfer Stars
